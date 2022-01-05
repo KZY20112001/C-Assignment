@@ -135,7 +135,7 @@ if (found == 0){
 
 
 
-//add a name card to the database and sort the information according to the names
+//add a name card to the database 
 int addNameCards(NameCard *c, int size){
 int i;
 char bufferPN[20], bufferCN[20], dummychar,*p;
@@ -216,6 +216,8 @@ else{
 
 
 
+
+//arrange the information according to the ID (using bubble sort)
 void arrangeNameCards(NameCard *c, int size){
 int i, step ;
 NameCard temp;
