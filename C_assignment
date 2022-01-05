@@ -1,0 +1,243 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#define MAX 5
+
+
+
+//structure declaration 
+typedef struct{
+char personName[20];
+char companyName[20];
+int nameCardID;
+}NameCard;
+
+
+//functions declaration
+void listNameCards(NameCard *c, int size);
+void arrangeNameCards(NameCard *c, int size);
+void removeNameCard(NameCard *c, char *target, int *size);
+void getNameCard(NameCard *c, char *target, int size);
+int addNameCards(NameCard *c, int size);
+void upperStr(char *str);
+
+
+
+
+//print display screen
+int main()
+{
+NameCard n[MAX];
+int choice,size = 0,result;
+char target[20], dummychar, *p;
+
+
+printf("NTU NAME CARD HOLDER MANAGEMENT PROGRAM:\n");
+printf("1: listNameCards()\n");
+printf("2: addNameCard()\n");
+printf("3: removeNameCard()\n");
+printf("4: getNameCard()\n");
+printf("5: quit\n");
+
+do{
+    printf("Enter your choice:\n");
+    scanf("%d", &choice);
+    switch (choice){
+    case 1:
+        printf("listNameCards():\n");
+        listNameCards(n,size);
+        break;
+
+    case 2:
+        printf("addNameCard():\n");
+        result = addNameCards(n,size);
+        if (result == 2){
+            printf("The name card holder is full\n");
+        }
+        else if (result == 0){
+            printf("The name card has been added successfully\n");
+            size += 1;
+            arrangeNameCards(n, size);
+        }
+        else if (result == 1){
+            printf("The nameCardID has already existed\n");
+        }
+        break;
+
+    case 3:
+        printf("removeNameCard():\n");
+        printf("Enter personName:\n");
+        scanf("%c", &dummychar);
+        fgets(target, 20, stdin);
+        if (p = strchr(target, '\n')) *p = '\0';
+        removeNameCard(n, target, &size);
+        break;
+
+    case 4:
+        printf("getNameCard():\n");
+        printf("Enter personName:\n");
+        scanf("%c", &dummychar);
+        fgets(target, 20, stdin);
+        if (p = strchr(target, '\n')) *p = '\0' ;
+        getNameCard(n, target, size);
+        break;
+    }
+}while(choice < 5);
+return 0;
+}
+
+
+
+
+
+//list the ID, name, and company names of people 
+void listNameCards(NameCard *c, int size){
+int i;
+if(size == 0){
+    printf("The name card holder is empty\n");
+}
+else{
+    for (i = 0; i< size; i++){
+        printf("nameCardID: %d\n", c[i].nameCardID);
+        printf("personName: %s\n", c[i].personName);
+        printf("companyName: %s\n", c[i].companyName);
+    }
+}
+}
+
+
+
+
+//find the specific information about a person from the database
+void getNameCard(NameCard *c, char *target, int size){
+int i , found = 0;
+char bufferStr[20];
+
+upperStr(target);
+for (i = 0; i< size; i++){
+    strcpy(bufferStr, c[i].personName);
+    upperStr(bufferStr);
+    if (strcmp(bufferStr,target) == 0){
+        found = 1;
+        printf("The target person name is found\n");
+        printf("nameCardID: %d\n", c[i].nameCardID);
+        printf("personName: %s\n", c[i].personName);
+        printf("companyName: %s\n", c[i].companyName);
+        break;
+    }
+}
+if (found == 0){
+    printf("The target person name is not found\n");
+}
+}
+
+
+
+
+//add a name card to the database and sort the information according to the names
+int addNameCards(NameCard *c, int size){
+int i;
+char bufferPN[20], bufferCN[20], dummychar,*p;
+int bufferID;
+
+printf("Enter nameCardID:\n");
+scanf("%d", &bufferID);
+
+printf("Enter personName:\n");
+scanf("%c", &dummychar);
+fgets(bufferPN, 20, stdin);
+if (p = strchr(bufferPN, '\n')) *p = '\0';
+
+printf("Enter companyName:\n");
+fgets(bufferCN, 20, stdin);
+if (p = strchr(bufferCN, '\n')) *p = '\0';
+
+if (size == MAX){
+    return 2;
+}
+for (i = 0; i < size; i++){
+    if (bufferID == c[i].nameCardID){
+        return 1;
+    }
+}
+
+c[size].nameCardID = bufferID;
+strcpy(c[size].personName, bufferPN);
+strcpy(c[size].companyName, bufferCN);
+return 0;
+}
+
+
+
+
+
+
+
+
+
+
+//remove a specific name from the database 
+void removeNameCard(NameCard *c, char *target, int *size){
+int i,j,found= 0;
+char bufferName[20];
+
+upperStr(target);
+if (*size == 0){
+    printf("The name card holder is empty\n");
+    return;
+}
+
+for (i =0; i < *size; i++){
+    strcpy(bufferName, c[i].personName);
+    upperStr(bufferName);
+    if (strcmp(bufferName, target) == 0){
+        found = 1;
+        break;
+    }
+}
+
+if (found == 1){
+    printf("The name card is removed\n");
+    printf("nameCardID: %d\n", c[i].nameCardID);
+    printf("personName: %s\n", c[i].personName);
+    printf("companyName: %s\n", c[i].companyName);
+    for (j = i + 1; j < *size; j++){
+        strcpy(c[j-1].personName, c[j].personName);
+        strcpy(c[j-1].companyName, c[j].companyName);
+        c[j-1].nameCardID = c[j].nameCardID;
+    }
+    *size -= 1;
+}
+else{
+    printf("The target person name is not in the name card holder\n");
+}
+}
+
+
+
+void arrangeNameCards(NameCard *c, int size){
+int i, step ;
+NameCard temp;
+
+for (step = 0; step< size -1; step++){
+    for (i = 0; i < size - step -1 ; i++){
+        if (c[i].nameCardID > c[i+1].nameCardID){
+            temp = c[i];
+            c[i] = c[i +1];
+            c[i+1] = temp;
+        }
+    }
+}
+}
+
+
+
+
+
+void upperStr(char *str){
+while(*str != '\0'){
+    *str = tolower(*str);
+    str++;
+}
+}
